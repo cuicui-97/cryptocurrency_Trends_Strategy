@@ -1,4 +1,4 @@
-# Cryptocurrency Intensity Strategy
+# Cryptocurrency Trendds Strategy
 
 基于市场强度信号的 BTC U本位永续合约趋势策略。通过 Binance 合约测试网 WebSocket 实时采集成交数据，计算买卖双方力量对比，在明显趋势出现时自动市价开仓，并同时挂止盈和止损限价单，实现完整的开仓、止盈、止损闭环。
 
