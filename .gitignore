@@ -1,0 +1,9 @@
+.env
+*.log
+__pycache__/
+*.pyc
+logs/
+docs/
+.claude/
+.DS_Store
+trader/backtest/data/
