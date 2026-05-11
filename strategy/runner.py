@@ -33,13 +33,13 @@ class StrategyRunner:
     async def run(self) -> None:
         self.logger.info("=" * 50)
         self.logger.info(
-            f"策略启动: symbol={self.fetcher.instId} "
+            f"策略启动: symbol={self.fetcher.symbol} "
             f"window={self.signal_generator.window_size} "
-            f"long={STRATEGY_CONFIG.THRESHOLD_LONG} short={STRATEGY_CONFIG.THRESHOLD_SHORT}"
+            f"long={STRATEGY_CONFIG.threshold_long} short={STRATEGY_CONFIG.threshold_short}"
         )
         self.logger.info("=" * 50)
 
-        await self.exchange.connect_and_login()
+        await self.exchange.connect()
         fetcher_task = asyncio.create_task(self.fetcher.run())
 
         trade_count = 0
@@ -66,7 +66,7 @@ class StrategyRunner:
                     f"队列剩余={queue_size}"
                 )
 
-                if (trade_count - 1) % STRATEGY_CONFIG.WINDOW_SIZE == 0:
+                if (trade_count - 1) % STRATEGY_CONFIG.window_size == 0:
                     window_start = time.time()
 
                 self.signal_generator.add_trade(trade)
@@ -79,27 +79,27 @@ class StrategyRunner:
         finally:
             self.logger.info("[引擎] 主循环结束")
             self.logger.info(f"[最终统计] {self.pnl_tracker.summary()}")
-            await self.exchange.close()
+            await self.exchange.disconnect()
             await fetcher_task
 
     def _on_window_complete(self, trade_count: int, window_start: float) -> None:
         intensity = self.signal_generator.last_intensity
         elapsed = time.time() - window_start
         self.logger.info(
-            f"[窗口] 第 {trade_count // STRATEGY_CONFIG.WINDOW_SIZE} 窗口 "
+            f"[窗口] 第 {trade_count // STRATEGY_CONFIG.window_size} 窗口 "
             f"耗时={elapsed:.3f}s 强度={intensity:.6f}"
         )
 
         signal = self.signal_generator.get_signal()
         if signal:
-            price = (self.fetcher.get_latest_bid_price(0) if signal == "buy"
-                     else self.fetcher.get_latest_ask_price(0))
+            price = (self.fetcher.get_latest_bid(0) if signal == "buy"
+                     else self.fetcher.get_latest_ask(0))
             if price is None:
                 self.logger.warning("[引擎] 无法获取价格，跳过下单")
                 return
             self.logger.info(f"[信号] {signal.upper()} price={price}")
             self.order_executor.execute(
-                self.fetcher.instId, signal, price, STRATEGY_CONFIG.ORDER_SIZE
+                self.fetcher.symbol, signal, price, STRATEGY_CONFIG.order_size
             )
         else:
             self.logger.info(f"[信号] 强度 {intensity:.4f} 未超阈值，无信号")

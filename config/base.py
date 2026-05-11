@@ -19,7 +19,7 @@ class TradingConfig:
 @dataclass(frozen=True)
 class LoggingConfig:
     """日志配置"""
-    trader_log_file: str = "logs/trader_info.log"
+    execution_log_file: str = "logs/execution_info.log"
     trade_log_file: str = "logs/trade_data.log"
     order_book_log_file: str = "logs/order_book.log"
 

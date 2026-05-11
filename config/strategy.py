@@ -47,7 +47,11 @@ class StrategyConfig:
 
     @property
     def log_file(self) -> str:
-        return self.logging.trader_log_file
+        return self.logging.execution_log_file
+
+    @property
+    def TRADER_LOG_FILE(self) -> str:
+        return self.logging.trade_log_file
 
 
 # 默认实例

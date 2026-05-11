@@ -33,7 +33,7 @@ from config import BACKTEST_CONFIG
 from config import STRATEGY_CONFIG
 from core.data_feed import DataFeed
 from core.logger import make_logger
-from core.types import Trade, OrderBookSnapshot, TradeDataLegacy as TradeData
+from core.types import Trade, OrderBookSnapshot, OrderBookLevel, TradeDataLegacy as TradeData
 from backtest.exchange import BacktestExchange
 from config.base import TradingConfig
 
@@ -145,10 +145,22 @@ class BacktestDataFeed(DataFeed):
             for row in csv.DictReader(f):
                 row: dict[str, str]
                 ts: str = row["timestamp"]
-                snapshot: OrderBookSnapshot = {
-                    "bids": json.loads(row["bids"]),
-                    "asks": json.loads(row["asks"]),
-                }
+                # 解析时间戳：支持毫秒时间戳或 ISO 格式日期字符串
+                try:
+                    ts_ms = int(ts)
+                except ValueError:
+                    ts_ms = int(datetime.fromisoformat(ts).timestamp() * 1000)
+                # 解析 bids 和 asks，转换为 OrderBookLevel 列表
+                bids_data: list[list[float]] = json.loads(row["bids"])
+                asks_data: list[list[float]] = json.loads(row["asks"])
+                bids = [OrderBookLevel(price=p, size=q) for p, q in bids_data]
+                asks = [OrderBookLevel(price=p, size=q) for p, q in asks_data]
+                snapshot = OrderBookSnapshot(
+                    symbol=self.symbol,
+                    timestamp_ms=ts_ms,
+                    bids=bids,
+                    asks=asks,
+                )
                 self._book_index[ts] = snapshot
 
         self._book_timestamps = sorted(self._book_index.keys())

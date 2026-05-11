@@ -77,8 +77,11 @@ class BacktestExchange(Exchange):
     # BaseTrader 标准接口
     # ─────────────────────────────────────────────────────
 
-    async def connect_and_login(self) -> None:
+    async def connect(self) -> None:
         self.logger.info("[回测] BacktestExchange 初始化完成")
+
+    async def disconnect(self) -> None:
+        self.logger.info("[回测] BacktestExchange 关闭")
 
     async def submit_market_order(self, symbol: str, side: str,
                                   size: float) -> str | None:

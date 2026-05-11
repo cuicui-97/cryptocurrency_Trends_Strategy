@@ -23,9 +23,9 @@ from strategy.runner import StrategyRunner
 
 def main():
     parser = argparse.ArgumentParser(description="撮合引擎回测")
-    parser.add_argument("--trades", default=BACKTEST_CONFIG.DEFAULT_TRADES_CSV, help="aggTrades CSV 路径")
-    parser.add_argument("--book",   default=BACKTEST_CONFIG.DEFAULT_BOOK_CSV,   help="bookDepth CSV 路径")
-    parser.add_argument("--speed",  type=float, default=BACKTEST_CONFIG.DEFAULT_SPEED,
+    parser.add_argument("--trades", default=BACKTEST_CONFIG.trades_csv, help="aggTrades CSV 路径")
+    parser.add_argument("--book",   default=BACKTEST_CONFIG.book_csv,   help="bookDepth CSV 路径")
+    parser.add_argument("--speed",  type=float, default=BACKTEST_CONFIG.playback_speed,
                         help="回放速度倍率：0=全速，1.0=真实时间，2.0=2倍速（默认0）")
     args = parser.parse_args()
 
