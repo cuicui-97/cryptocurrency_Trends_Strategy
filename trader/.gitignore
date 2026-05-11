@@ -1,7 +1,0 @@
-.env
-*.log
-__pycache__/
-*.pyc
-logs/
-docs/
-.claude/
